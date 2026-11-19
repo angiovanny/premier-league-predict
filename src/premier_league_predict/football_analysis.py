@@ -38,3 +38,17 @@ def count_team_away_victories(
     team: str,
 ) -> int:
     return _count_team_victories(matches, team)["away"]
+
+
+def count_team_draws(
+    matches: Iterable[dict],
+    team: str,
+) -> int:
+    draws = 0
+
+    for match in matches:
+        if match["FTR"] == "D":
+            if match["HomeTeam"] == team or match["AwayTeam"] == team:
+                draws += 1
+
+    return draws
