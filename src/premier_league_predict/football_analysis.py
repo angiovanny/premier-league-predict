@@ -1,54 +1,69 @@
 from collections.abc import Iterable
 
 
-def _count_team_victories(
+def _get_team_statistics(
     matches: Iterable[dict],
     team: str,
 ) -> dict[str, int]:
-    victories = {
-        "home": 0,
-        "away": 0,
+    statistics = {
+        "home_victories": 0,
+        "away_victories": 0,
+        "losses": 0,
+        "draws": 0,
     }
 
-    for match in matches:
-        if match["HomeTeam"] == team and match["FTR"] == "H":
-            victories["home"] += 1
+    for game in matches:
+        if game["HomeTeam"] != team and game["AwayTeam"] != team:
+            continue
 
-        if match["AwayTeam"] == team and match["FTR"] == "A":
-            victories["away"] += 1
+        match game["FTR"]:
+            case "H":
+                if game["HomeTeam"] == team:
+                    statistics["home_victories"] += 1
+                else:
+                    statistics["losses"] += 1
 
-    return victories
+            case "A":
+                if game["HomeTeam"] == team:
+                    statistics["losses"] += 1
+                else:
+                    statistics["away_victories"] += 1
+
+            case "D":
+                statistics["draws"] += 1
+
+    return statistics
 
 
 def count_team_victories(matches: Iterable[dict], team: str) -> int:
-    victories = _count_team_victories(matches, team)
+    statistics = _get_team_statistics(matches, team)
 
-    return victories["away"] + victories["home"]
+    return statistics["away_victories"] + statistics["home_victories"]
 
 
 def count_team_home_victories(
     matches: Iterable[dict],
     team: str,
 ) -> int:
-    return _count_team_victories(matches, team)["home"]
+    return _get_team_statistics(matches, team)["home_victories"]
 
 
 def count_team_away_victories(
     matches: Iterable[dict],
     team: str,
 ) -> int:
-    return _count_team_victories(matches, team)["away"]
+    return _get_team_statistics(matches, team)["away_victories"]
 
 
 def count_team_draws(
     matches: Iterable[dict],
     team: str,
 ) -> int:
-    draws = 0
+    return _get_team_statistics(matches, team)["draws"]
 
-    for match in matches:
-        if match["FTR"] == "D":
-            if match["HomeTeam"] == team or match["AwayTeam"] == team:
-                draws += 1
 
-    return draws
+def count_team_losses(
+    matches: Iterable[dict],
+    team: str,
+) -> int:
+    return _get_team_statistics(matches, team)["losses"]
